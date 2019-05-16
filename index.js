@@ -6,6 +6,8 @@ import {Image, Linking, Platform, Text, TouchableOpacity, View, ViewPropTypes} f
 const REGEX = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/g;
 
 export default class RNUrlPreview extends React.Component {
+    _isMounted = false;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -18,12 +20,26 @@ export default class RNUrlPreview extends React.Component {
         this.getPreview(props.text)
     }
 
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;   
+    }
+
+    updateState(newState) {
+        if (this._isMounted) {
+            this.setState(newState);
+        }
+    }
+
     getPreview = (text) =>{
         let url = text && text.match(REGEX) && text.match(REGEX)[0]
         if(url){
             LinkPreview.getPreview(url)
                 .then(data => {
-                    this.setState({
+                    this.updateState({
                         isUri: true,
                         linkTitle: data.title ? data.title : undefined,
                         linkDesc: data.description ? data.description : undefined,
@@ -35,7 +51,7 @@ export default class RNUrlPreview extends React.Component {
                     })
                 }).catch(error => console.log("LinkPreview error : ",error) );
         }else {
-            this.setState({isUri: false})
+            this.updateState({isUri: false})
         }
 
     }
@@ -44,7 +60,7 @@ export default class RNUrlPreview extends React.Component {
         if(nextProps.text !== null ){
             this.getPreview(nextProps.text)
         }else{
-            this.setState({isUri: false})
+            this.updateState({isUri: false})
         }
     }
 
@@ -60,12 +76,12 @@ export default class RNUrlPreview extends React.Component {
                     <Image
                         style={imageStyle}
                         source={{uri: imageLink}}
-                        resizeMode={'cover'}
+                        resizeMode={'contain'}
                     /> : faviconLink ?
                     <Image
                         style={faviconStyle}
                         source={{uri: faviconLink}}
-                        resizeMode={'cover'}
+                        resizeMode={'contain'}
                     /> : null
         )
     }
@@ -96,10 +112,10 @@ export default class RNUrlPreview extends React.Component {
                 activeOpacity={0.9}
                 onPress={()=>this._onLinkPressed()}
             >
-                {this.renderImage(imageLink,faviconLink,imageStyle,faviconStyle)}
                 {this.renderText(showTitle,title,description,textContainerStyle,titleStyle,descriptionStyle,titleNumberOfLines,descriptionNumberOfLines)}
+                {this.renderImage(imageLink,faviconLink,imageStyle,faviconStyle)}
             </TouchableOpacity>
-    )
+        )
     }
 
     render() {
@@ -129,39 +145,44 @@ RNUrlPreview.defaultProps = {
         alignItems: 'center'
     },
     imageStyle: {
-        width: Platform.isPad ? 160 : 110,
-        height: Platform.isPad ? 160 : 110,
+        width: Platform.isPad ? 160 : 85,
+        height: Platform.isPad ? 160 : 85,
         paddingRight: 10,
-        paddingLeft: 10
+        paddingLeft: 5
     },
     faviconStyle: {
         width: 40,
         height: 40,
         paddingRight: 10,
-        paddingLeft: 10
+        paddingLeft: 5
     },
     textContainerStyle: {
         flex: 1,
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
-        padding: 10
+        paddingLeft: 5,
+        paddingVertical: 10,
+        paddingRight: 10
     },
     title: true,
     titleStyle: {
-        fontSize: 17,
+        fontSize: 12,
         color: '#000',
         marginRight: 10,
+        marginTop: 10,
         marginBottom: 5,
+        fontWeight: '500',
         alignSelf: 'flex-start'
     },
     titleNumberOfLines: 2,
     descriptionStyle: {
-        fontSize: 14,
-        color: '#81848A',
+        fontSize: 10,
         marginRight: 10,
+        fontWeight: '300',
+        paddingBottom: 5,
         alignSelf: 'flex-start'
     },
-    descriptionNumberOfLines: Platform.isPad ? 4 : 3,
+    descriptionNumberOfLines: Platform.isPad ? 4 : 2,
 };
 
 RNUrlPreview.propTypes = {
