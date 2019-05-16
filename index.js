@@ -152,16 +152,14 @@ RNUrlPreview.defaultProps = {
         color: '#000',
         marginRight: 10,
         marginBottom: 5,
-        alignSelf: 'flex-start',
-        fontFamily: 'Helvetica'
+        alignSelf: 'flex-start'
     },
     titleNumberOfLines: 2,
     descriptionStyle: {
         fontSize: 14,
         color: '#81848A',
         marginRight: 10,
-        alignSelf: 'flex-start',
-        fontFamily: 'Helvetica'
+        alignSelf: 'flex-start'
     },
     descriptionNumberOfLines: Platform.isPad ? 4 : 3,
 };
