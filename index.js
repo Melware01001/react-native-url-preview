@@ -17,7 +17,7 @@ export default class RNUrlPreview extends React.Component {
             linkFavicon:undefined,
             linkImg: undefined
         };
-        this.getPreview(props.text)
+        this.getPreview(props.text, props.onLinkLoaded, props.onLinkFailed)
     }
 
     componentDidMount() {
@@ -34,11 +34,12 @@ export default class RNUrlPreview extends React.Component {
         }
     }
 
-    getPreview = (text) =>{
+    getPreview = (text, onLinkLoaded, onLinkFailed) =>{
         let url = text && text.match(REGEX) && text.match(REGEX)[0]
         if(url){
             LinkPreview.getPreview(url)
                 .then(data => {
+                    onLinkLoaded(data);
                     this.updateState({
                         isUri: true,
                         linkTitle: data.title ? data.title : undefined,
@@ -49,7 +50,7 @@ export default class RNUrlPreview extends React.Component {
                             }) :  undefined ,
                         linkFavicon: data.favicons && data.favicons.length > 0 ? data.favicons[data.favicons.length - 1] : undefined
                     })
-                }).catch(error => console.log("LinkPreview error : ",error) );
+                }).catch(error => onLinkFailed(error));
         }else {
             this.updateState({isUri: false})
         }
@@ -58,7 +59,7 @@ export default class RNUrlPreview extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if(nextProps.text !== null ){
-            this.getPreview(nextProps.text)
+            this.getPreview(nextProps.text, nextProps.onRssFeedLoaded, nextProps.onRssFeedFailed)
         }else{
             this.updateState({isUri: false})
         }
@@ -103,14 +104,17 @@ export default class RNUrlPreview extends React.Component {
             </View>
         )
     }
-    renderLinkPreview = (text,containerStyle,
+    renderLinkPreview = (text, onPress, containerStyle,
                          imageLink,faviconLink,imageStyle,faviconStyle,
                          showTitle,title,description,textContainerStyle,titleStyle,descriptionStyle,titleNumberOfLines,descriptionNumberOfLines)=> {
         return(
             <TouchableOpacity
                 style={[styles.containerStyle,containerStyle]}
                 activeOpacity={0.9}
-                onPress={()=>this._onLinkPressed()}
+                onPress={()=> {
+                    onPress();
+                    this._onLinkPressed();
+                }}
             >
                 {this.renderText(showTitle,title,description,textContainerStyle,titleStyle,descriptionStyle,titleNumberOfLines,descriptionNumberOfLines)}
                 {this.renderImage(imageLink,faviconLink,imageStyle,faviconStyle)}
@@ -119,10 +123,10 @@ export default class RNUrlPreview extends React.Component {
     }
 
     render() {
-        const { text, containerStyle, imageStyle, faviconStyle, textContainerStyle, title, titleStyle, titleNumberOfLines, descriptionStyle, descriptionNumberOfLines } = this.props;
+        const { text, onPress, containerStyle, imageStyle, faviconStyle, textContainerStyle, title, titleStyle, titleNumberOfLines, descriptionStyle, descriptionNumberOfLines } = this.props;
         return (
             this.state.isUri ?  this.renderLinkPreview(
-                text,containerStyle,
+                text, onPress, containerStyle,
                 this.state.linkImg,this.state.linkFavicon,imageStyle,faviconStyle,
                 title,this.state.linkTitle,this.state.linkDesc,textContainerStyle,titleStyle,descriptionStyle,titleNumberOfLines,descriptionNumberOfLines) : null
         );
