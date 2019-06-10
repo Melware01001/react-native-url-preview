@@ -24,7 +24,7 @@
     "react-native-windows": "0.41.0-rc.1"
   },
   "dependencies": {
-    "react-native-link-preview": "^1.3.7"
+    "react-native-link-preview": "https://github.com/mdloselo/react-native-link-preview.git"
   },
   "devDependencies": {},
   "repository": {
