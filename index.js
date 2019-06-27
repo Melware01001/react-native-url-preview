@@ -150,7 +150,7 @@ RNUrlPreview.defaultProps = {
     },
     imageStyle: {
         width: Platform.isPad ? 160 : 85,
-        height: Platform.isPad ? 160 : 85,
+        height: Platform.isPad ? 160 : '100%',
         paddingRight: 10,
         paddingLeft: 5
     },
