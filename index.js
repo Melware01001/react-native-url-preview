@@ -17,7 +17,7 @@ export default class RNUrlPreview extends React.Component {
             linkFavicon:undefined,
             linkImg: undefined
         };
-        this.getPreview(props.text, props.onLinkLoaded, props.onLinkFailed)
+        this.getPreview(props.defaultData, props.text, props.onLinkLoaded, props.onLinkFailed)
     }
 
     componentDidMount() {
@@ -34,7 +34,7 @@ export default class RNUrlPreview extends React.Component {
         }
     }
 
-    getPreview = (text, onLinkLoaded, onLinkFailed) =>{
+    getPreview = (defaultData, text, onLinkLoaded, onLinkFailed) =>{
         let url = text && text.match(REGEX) && text.match(REGEX)[0]
         if(url){
             LinkPreview.getPreview(url)
@@ -50,7 +50,20 @@ export default class RNUrlPreview extends React.Component {
                             }) :  undefined ,
                         linkFavicon: data.favicons && data.favicons.length > 0 ? data.favicons[data.favicons.length - 1] : undefined
                     })
-                }).catch(error => onLinkFailed(error));
+                }).catch(error => {
+                    onLinkFailed(error);
+                    if(defaultData) {
+                        this.updateState({
+                            isUri: true,
+                            linkTitle: defaultData.title ? defaultData.title : undefined,
+                            linkDesc: defaultData.description ? defaultData.description : undefined,
+                            linkImg: defaultData.images && defaultData.images.length > 0 ?
+                                defaultData.images.find(function (element) {
+                                    return (element.includes('.png') || element.includes('.jpg') || element.includes('.jpeg'))
+                                }) :  undefined,
+                        });
+                    }
+                });
         }else {
             this.updateState({isUri: false})
         }
@@ -59,7 +72,7 @@ export default class RNUrlPreview extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if(nextProps.text !== null ){
-            this.getPreview(nextProps.text, nextProps.onRssFeedLoaded, nextProps.onRssFeedFailed)
+            this.getPreview(nextProps.defaultData, nextProps.text, nextProps.onRssFeedLoaded, nextProps.onRssFeedFailed)
         }else{
             this.updateState({isUri: false})
         }
