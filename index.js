@@ -46,7 +46,7 @@ export default class RNUrlPreview extends React.Component {
                         linkDesc: data.description ? data.description : undefined,
                         linkImg: data.images && data.images.length > 0 ?
                             data.images.find(function (element) {
-                                return (element.includes('.png') || element.includes('.jpg') || element.includes('.jpeg'))
+                                return (element.includes('.png') || element.includes('.jpg') || element.includes('.jpeg') || element.includes('data:image/'))
                             }) :  undefined ,
                         linkFavicon: data.favicons && data.favicons.length > 0 ? data.favicons[data.favicons.length - 1] : undefined
                     })
@@ -59,7 +59,7 @@ export default class RNUrlPreview extends React.Component {
                             linkDesc: defaultData.description ? defaultData.description : undefined,
                             linkImg: defaultData.images && defaultData.images.length > 0 ?
                                 defaultData.images.find(function (element) {
-                                    return (element.includes('.png') || element.includes('.jpg') || element.includes('.jpeg'))
+                                    return (element.includes('.png') || element.includes('.jpg') || element.includes('.jpeg') || element.includes('data:image/'))
                                 }) :  undefined,
                         });
                     }
